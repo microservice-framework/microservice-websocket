@@ -1,0 +1,24 @@
+{
+  "name": "microservice-websocket",
+  "version": "1.0.0",
+  "description": "Websocket based API router. Allow to listen to new messages across API",
+  "main": "websocket.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/microservice-framework/microservice-websocket.git"
+  },
+  "author": "Gormartsen",
+  "license": "GPL-3.0",
+  "bugs": {
+    "url": "https://github.com/microservice-framework/microservice-websocket/issues"
+  },
+  "homepage": "https://github.com/microservice-framework/microservice-websocket#readme",
+  "dependencies": {
+    "debug": "^2.6.5",
+    "dotenv": "^4.0.0",
+    "ws": "^2.3.1"
+  }
+}

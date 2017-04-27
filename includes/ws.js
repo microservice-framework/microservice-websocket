@@ -27,39 +27,39 @@ function WebSocketServer(data) {
   });
   self.UDPServer = dgram.createSocket('udp4');
   self.UDPServer.bind(data.ws.port);
-  self.UDPServer.on('error', function(err){
+  self.UDPServer.on('error', function(err) {
     self.debug.log('UDP Server error %O', err);
     server.close();
   });
 
-  self.UDPServer.on('message', function(message, rinfo){
+  self.UDPServer.on('message', function(message, rinfo) {
     self.debug.debug('UDP: received %s from %s:%s', message, rinfo.address, rinfo.port);
     var answer = {}
-    try{
+    try {
       message = JSON.parse(message);
     } catch(e) {
       self.debug.debug('UDP: message parse error %O', e);
       answer.error = e.message;
-      answer= JSON.stringify(answer);
+      answer = JSON.stringify(answer);
 
-      return self.UDPServer.send(Buffer.from(answer), rinfo.port, rinfo.address ,function(err){
+      return self.UDPServer.send(Buffer.from(answer), rinfo.port, rinfo.address ,function(err) {
         self.debug.debug('UDP: sent error %O', err);
       });
     }
     process.send(JSON.stringify(message));
     answer = { message: message };
     answer = JSON.stringify(answer);
-    return self.UDPServer.send(Buffer.from(answer), rinfo.port, rinfo.address ,function(err){
+    return self.UDPServer.send(Buffer.from(answer), rinfo.port, rinfo.address ,function(err) {
         self.debug.debug('UDP: sent error %O', err);
       });
   });
 
-  self.UDPServer.on('listening', function(){
+  self.UDPServer.on('listening', function() {
     var address = self.UDPServer.address();
     self.debug.log('UDP Listen on %s:%s', address.address, address.port);
   });
 
-  process.on('message', function(message){
+  process.on('message', function(message) {
     self.message(message);
   });
 }
@@ -69,7 +69,7 @@ function WebSocketServer(data) {
  */
 WebSocketServer.prototype.message = function(message) {
   var self = this;
-  self.debug.debug("IPM Message received: %s", message.toString());
+  self.debug.debug('IPM Message received: %s', message.toString());
 
   self.WSServer.clients.forEach(function each(client) {
     if (client.readyState === WebSocket.OPEN) {
@@ -87,15 +87,15 @@ WebSocketServer.prototype.connection = function(ws) {
   self.debug.request('Client connected');
   ws.on('message', function(message) {
     self.debug.request('Message received %O', message);
-    try{
+    try {
       message = JSON.parse(message);
     } catch(e) {
       return ws.send({
         err: e.message
       });
     }
-    if( self.data.callbacks['clientMessage']) {
-      self.data.callbacks['clientMessage'](message, function(err, answer){
+    if (self.data.callbacks['clientMessage']) {
+      self.data.callbacks['clientMessage'](message, function(err, answer) {
         ws.send(JSON.stringify(answer , null, 2));
       });
     }

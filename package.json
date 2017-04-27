@@ -4,7 +4,8 @@
   "description": "Websocket based API router. Allow to listen to new messages across API",
   "main": "websocket.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "jscs": "jscs --fix *.js includes/*.js"
   },
   "repository": {
     "type": "git",

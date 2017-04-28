@@ -149,6 +149,19 @@ WebSocketServer.prototype.processIPMMessage = function(message) {
         if(limitMethods.indexOf(message.method.toLowerCase()) == -1) {
           return;
         }
+        // Check for values
+        for(var name in client.auth.scopes[message.scope].values) {
+          var value = client.auth.scopes[message.scope].values[name];
+          if(!message.message[name]) {
+            self.debug.debug('ipmBroadcast:message don\'t have %s', name);
+            return;
+          }
+          if(message.message[name] != value) {
+            self.debug.debug('ipmBroadcast:message[%s] != %s', name, value);
+            return;
+          }
+        }
+
       }
       if (self.data.callbacks['preSendMessage']) {
         self.debug.debug('Send message to client');

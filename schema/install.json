@@ -35,6 +35,12 @@
       "default": "http://localhost:3000",
       "required": true
     },
+    "router_proxy_url": {
+      "type": "string",
+      "description": "ROUTER PROXY URL (no trailing /)",
+      "default": "http://localhost:3100",
+      "required": true
+    },
     "router_secret": {
       "type": "string",
       "description": "ROUTER SECRET. Take it from microservice-router settings.",

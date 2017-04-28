@@ -5,7 +5,7 @@
   "main": "websocket.js",
   "scripts": {
     "test": "node_modules/.bin/mocha --timeout 15000",
-    "start": "DEBUG=http:log,cluster:* node  --max-old-space-size=48 microservice-auth.js",
+    "start": "DEBUG=http:log,cluster:* node  --max-old-space-size=48 websocket.js",
     "stop": "node kill.js",
     "status": "node status.js",
     "jscs": "jscs --fix *.js includes/*.js"

@@ -34,9 +34,6 @@ var mControlCluster = new WSCluster({
  */
 function websocketInit(cluster, worker, address) {
   if (worker.id == 1 && address.addressType == 4) {
-    console.log('Start register');
-//    console.log(worker);
-    console.log(address);
     var mserviceRegister = new MicroserviceRouterRegister({
       server: {
         url: process.env.ROUTER_URL,
@@ -48,6 +45,13 @@ function websocketInit(cluster, worker, address) {
         url: process.env.SELF_URL,
         secureKey: process.env.SECURE_KEY,
         scope: 'ws',
+        methods: {
+          post: 'data',
+          put: 'data',
+          delete: 'data',
+          search: 'meta',
+          get: 'meta',
+        }
       },
       cluster: cluster
     });
@@ -56,6 +60,9 @@ function websocketInit(cluster, worker, address) {
 
 function websocketPreSendMessage(jsonData, auth, callback) {
   debug.debug('Received pre Send Message %O %O', auth, jsonData);
+
+  jsonData.method.toLowerCase();
+//  jsonData.
   callback(null, jsonData);
 }
 /**

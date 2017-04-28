@@ -18,6 +18,7 @@
   },
   "homepage": "https://github.com/microservice-framework/microservice-websocket#readme",
   "dependencies": {
+    "@microservice-framework/microservice-router-register": "^1.2.0",
     "debug": "^2.6.5",
     "dotenv": "^4.0.0",
     "ws": "^2.3.1"

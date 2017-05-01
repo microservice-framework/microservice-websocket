@@ -4,7 +4,7 @@ require('dotenv').config();
 
 var pid = false;
 if (process.env.PIDFILE) {
-  try{
+  try {
     pid = fs.readFileSync(process.env.PIDFILE).toString('utf8');
   }catch(e) {}
 }

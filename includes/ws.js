@@ -8,7 +8,9 @@ const WebSocket = require('ws');
 const debugF = require('debug');
 const dgram = require('dgram');
 const signature = require('./signature.js');
-const clientViaRouter = require('@microservice-framework/microservice-router-register').clientViaRouter;
+const framework = '@microservice-framework';
+const clientViaRouter = require(framework + '/microservice-router-register').clientViaRouter;
+const loaderByList = require(framework + '/microservice-router-register').loaderByList;
 
 /**
  * Constructor.
@@ -64,39 +66,39 @@ WebSocketServer.prototype.processUDPmessage = function(message, rinfo) {
     answer = JSON.stringify(answer);
 
     return self.UDPServer.send(Buffer.from(answer), rinfo.port, rinfo.address ,function(err) {
-      if(err) {
+      if (err) {
         self.debug.debug('UDP: sent error %O', err);
       }
     });
   }
   var sign = message.signature;
   delete message.signature;
-  if(!sign) {
+  if (!sign) {
     answer.error = 'No signature provided';
     answer = JSON.stringify(answer);
     return self.UDPServer.send(Buffer.from(answer), rinfo.port, rinfo.address ,function(err) {
-      if(err) {
+      if (err) {
         self.debug.debug('UDP: sent error %O', err);
       }
     });
   }
-  if(sign.length != 2) {
+  if (sign.length != 2) {
     self.debug.debug('UDP:Signature Malformed signature');
     answer.error = 'Malformed signature.';
     answer = JSON.stringify(answer);
     return self.UDPServer.send(Buffer.from(answer), rinfo.port, rinfo.address ,function(err) {
-      if(err) {
+      if (err) {
         self.debug.debug('UDP: sent error %O', err);
       }
     });
   }
 
-  if(sign[1] != signature(sign[0], JSON.stringify(message), process.env.SECURE_KEY)) {
+  if (sign[1] != signature(sign[0], JSON.stringify(message), process.env.SECURE_KEY)) {
     answer.error = 'Signature mismatch.';
     self.debug.debug('UDP:Signature mismatch');
     answer = JSON.stringify(answer);
     return self.UDPServer.send(Buffer.from(answer), rinfo.port, rinfo.address ,function(err) {
-      if(err) {
+      if (err) {
         self.debug.debug('UDP: sent error %O', err);
       }
     });
@@ -108,7 +110,7 @@ WebSocketServer.prototype.processUDPmessage = function(message, rinfo) {
   answer = JSON.stringify(answer);
 
   return self.UDPServer.send(Buffer.from(answer), rinfo.port, rinfo.address ,function(err) {
-    if(err) {
+    if (err) {
       self.debug.debug('UDP: sent error %O', err);
     }
   });
@@ -131,37 +133,53 @@ WebSocketServer.prototype.processIPMMessage = function(message) {
     if (client.readyState === WebSocket.OPEN) {
 
       // Check for token expire.
-      if(client.auth.expireAt != -1) {
-        if(client.auth.expireAt < Date.now()) {
+      if (!ws.auth.internal) {
+        if (client.auth.expireAt != -1 && client.auth.expireAt < Date.now()) {
           self.debug.debug('ipmBroadcast:expired token %s', client.auth.accessToken);
           return client.close(3003, 'Token expired');
         }
-        if(!client.auth.scopes[message.scope]) {
+        if (!client.auth.scopes[message.scope]) {
           self.debug.debug('ipmBroadcast:no scope % for token %s', message.scope, client.auth.accessToken);
           return;
         }
-        if(!client.auth.scopes[message.scope].methods[message.method.toLowerCase()]) {
-          self.debug.debug('ipmBroadcast: scope %s for token %s do not support %s', message.scope, client.auth.accessToken, message.method);
+        if (!client.auth.scopes[message.scope]['get']
+          && !client.auth.scopes[message.scope]['search']) {
+          self.debug.debug('ipmBroadcast: scope %s for token %s do not support get or search', message.scope, client.auth.accessToken);
           return;
         }
         // IF authorized by access token, send POST, PUT, DELETE only.
         var limitMethods = ['put', 'post', 'delete'];
-        if(limitMethods.indexOf(message.method.toLowerCase()) == -1) {
+        if (limitMethods.indexOf(message.method.toLowerCase()) == -1) {
           return;
         }
-        // Check for values
-        for(var name in client.auth.scopes[message.scope].values) {
-          var value = client.auth.scopes[message.scope].values[name];
-          if(!message.message[name]) {
-            self.debug.debug('ipmBroadcast:message don\'t have %s', name);
-            return;
-          }
-          if(message.message[name] != value) {
-            self.debug.debug('ipmBroadcast:message[%s] != %s', name, value);
-            return;
-          }
-        }
 
+        loaderByList(message.loaders, client.auth.accessToken, function(err, result) {
+          if (err) {
+            return self.debug.debug('ipmBroadcast: scope %s for token %s failed on loaders %O', message.scope, client.auth.accessToken, err);
+          }
+          if (self.data.callbacks['preSendMessage']) {
+            self.debug.debug('Send message to client');
+            self.data.callbacks['preSendMessage'](message, client.auth, function(err, answer) {
+              client.send(JSON.stringify(answer));
+            });
+          }
+        });
+        return;
+
+      }
+      if (message.loaders) {
+        loaderByList(message.loaders, function(err, result) {
+          if (err) {
+            return self.debug.debug('ipmBroadcast: scope %s for token %s failed on loaders %O', message.scope, client.auth.accessToken, err);
+          }
+          if (self.data.callbacks['preSendMessage']) {
+            self.debug.debug('Send message to client');
+            self.data.callbacks['preSendMessage'](message, client.auth, function(err, answer) {
+              client.send(JSON.stringify(answer));
+            });
+          }
+        });
+        return;
       }
       if (self.data.callbacks['preSendMessage']) {
         self.debug.debug('Send message to client');
@@ -180,7 +198,7 @@ WebSocketServer.prototype.onValidated = function(ws) {
   var self = this;
   ws.on('message', function(message) {
     // Check for token expire.
-    if(ws.auth.expireAt != -1 && ws.auth.expireAt < Date.now()) {
+    if (ws.auth.expireAt != -1 && ws.auth.expireAt < Date.now()) {
       self.debug.debug('authServer:expired token %s', ws.auth.accessToken);
       return client.close(3003, 'Token expired');
     }
@@ -197,11 +215,11 @@ WebSocketServer.prototype.onValidated = function(ws) {
         url: auth
         method: POST
         data: {
-          test: 1 
+          test: 1
           test: 2
         }
       }
-      
+
     */
     if (self.data.callbacks['receivedMessage']) {
       self.data.callbacks['receivedMessage'](message, function(err, answer) {
@@ -223,16 +241,18 @@ WebSocketServer.prototype.connection = function(ws) {
   self.debug.request('Client connected');
   ws.auth = {}
   ws.auth.accessToken = ws.upgradeReq.url.substr(1);
-  if(ws.auth.accessToken == process.env.SECURE_KEY) {
+  if (ws.auth.accessToken == process.env.SECURE_KEY) {
     ws.auth.expireAt = -1;
+    ws.auth.internal = true;
     return self.onValidated(ws);
   }
   clientViaRouter('auth', function(err, authServer) {
-    if(err) {
+    if (err) {
       self.debug.debug('Validate:AccessToken err %O', err);
       ws.close(3003, 'auth service is unavailable');
       return;
     }
+
     authServer.search({
       accessToken: ws.auth.accessToken
     }, function(err, taskAnswer) {
@@ -240,30 +260,24 @@ WebSocketServer.prototype.connection = function(ws) {
         self.debug.debug('authServer:search err: %O', err);
         return ws.close(3004, 'Access denied. Token not found.');
       }
-      var accessScopes = {};
-      var accessFound = false;
-
-      for(var i in taskAnswer) {
-        var accessRecord = taskAnswer[i];
-        if(accessRecord.expireAt < Date.now()) {
-          self.debug.debug('authServer:expired token %s', accessRecord.accessToken);
-          continue;
-        }
-        for (var j in accessRecord.scope) {
-          accessFound = true;
-          var serviceScope = accessRecord.scope[j].service;
-          accessScopes[serviceScope] = {
-            methods: accessRecord.scope[j].methods,
-            values: accessRecord.scope[j].values,
-          }
-        }
-        ws.auth.expireAt = accessRecord.expireAt;
-        break;
+      let accessRecord = taskAnswer[0];
+      if (accessRecord.expireAt != -1 && accessRecord.expireAt < Date.now()) {
+        self.debug.debug('authServer:expired token %s', accessRecord.accessToken);
+        return ws.close(3003, 'Access denied. Token expired.');
       }
-      if(!accessFound) {
+      if (accessRecord.scope.length == 0) {
         self.debug.debug('No scopes found for access token %s', ws.accessToken);
         return ws.close(3004, 'Access denied. Scopes not defined for token.');
       }
+      ws.auth.expireAt = accessRecord.expireAt;
+
+      let accessScopes = {};
+
+      for (var j in accessRecord.scope) {
+        var serviceScope = accessRecord.scope[j].service;
+        accessScopes[serviceScope] = accessRecord.scope[j].methods;
+      }
+
       ws.auth.scopes = accessScopes;
       self.onValidated(ws);
     });

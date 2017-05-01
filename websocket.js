@@ -4,7 +4,8 @@
 'use strict';
 
 const WSCluster = require('./includes/cluster.js');
-const MicroserviceRouterRegister = require('@microservice-framework/microservice-router-register').register;
+const framework = '@microservice-framework';
+const MicroserviceRouterRegister = require(framework + '/microservice-router-register').register;
 
 const debugF = require('debug');
 
@@ -62,7 +63,7 @@ function websocketPreSendMessage(jsonData, auth, callback) {
   debug.debug('Received pre Send Message %O %O', auth, jsonData);
 
   jsonData.method.toLowerCase();
-//  jsonData.
+  //  jsonData.
   callback(null, jsonData);
 }
 /**

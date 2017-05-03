@@ -133,13 +133,13 @@ WebSocketServer.prototype.processIPMMessage = function(message) {
     if (client.readyState === WebSocket.OPEN) {
 
       // Check for token expire.
-      if (!ws.auth.internal) {
+      if (!client.auth.internal) {
         if (client.auth.expireAt != -1 && client.auth.expireAt < Date.now()) {
           self.debug.debug('ipmBroadcast:expired token %s', client.auth.accessToken);
           return client.close(3003, 'Token expired');
         }
         if (!client.auth.scopes[message.scope]) {
-          self.debug.debug('ipmBroadcast:no scope % for token %s', message.scope, client.auth.accessToken);
+          self.debug.debug('ipmBroadcast:no scope %s for token %s', message.scope, client.auth.accessToken);
           return;
         }
         if (!client.auth.scopes[message.scope]['get']
@@ -153,10 +153,16 @@ WebSocketServer.prototype.processIPMMessage = function(message) {
           return;
         }
 
+        // Do not share token per record when accessToken used.
+        if(message.message.token) {
+          delete message.message.token;
+        }
+
         loaderByList(message.loaders, client.auth.accessToken, function(err, result) {
           if (err) {
             return self.debug.debug('ipmBroadcast: scope %s for token %s failed on loaders %O', message.scope, client.auth.accessToken, err);
           }
+          message.loaders = result;
           if (self.data.callbacks['preSendMessage']) {
             self.debug.debug('Send message to client');
             self.data.callbacks['preSendMessage'](message, client.auth, function(err, answer) {
@@ -172,6 +178,7 @@ WebSocketServer.prototype.processIPMMessage = function(message) {
           if (err) {
             return self.debug.debug('ipmBroadcast: scope %s for token %s failed on loaders %O', message.scope, client.auth.accessToken, err);
           }
+          message.loaders = result;
           if (self.data.callbacks['preSendMessage']) {
             self.debug.debug('Send message to client');
             self.data.callbacks['preSendMessage'](message, client.auth, function(err, answer) {

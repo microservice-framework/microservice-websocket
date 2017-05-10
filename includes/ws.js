@@ -154,7 +154,7 @@ WebSocketServer.prototype.processIPMMessage = function(message) {
         }
 
         // Do not share token per record when accessToken used.
-        if(message.message.token) {
+        if (message.message.token) {
           delete message.message.token;
         }
 

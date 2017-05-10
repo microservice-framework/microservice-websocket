@@ -72,5 +72,5 @@ function websocketPreSendMessage(jsonData, auth, callback) {
  */
 function websocketReceivedMessage(jsonData, callback) {
   debug.debug('Received Client Message %O', jsonData);
-  callback(null, { method: 'test', message: {'All GooD', data: jsonData.date}});
+  callback(null, { method: 'test', message: { data: jsonData.date}});
 }

@@ -214,20 +214,10 @@ WebSocketServer.prototype.onValidated = function(ws) {
       message = JSON.parse(message);
     } catch(e) {
       return ws.send({
-        err: e.message
+        method: 'error',
+        message: e.message
       });
     }
-    /*
-      {
-        url: auth
-        method: POST
-        data: {
-          test: 1
-          test: 2
-        }
-      }
-
-    */
     if (self.data.callbacks['receivedMessage']) {
       self.data.callbacks['receivedMessage'](message, function(err, answer) {
         ws.send(JSON.stringify(answer , null, 2));

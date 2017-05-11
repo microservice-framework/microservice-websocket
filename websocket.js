@@ -76,7 +76,7 @@ function websocketPreSendMessage(jsonData, auth, callback) {
 function websocketReceivedMessage(jsonData, auth, callback) {
   debug.debug('Received Client Message %O', jsonData);
 
-  var errors = self.validateJson(jsonData);
+  var errors = websocketValidateJson(jsonData);
   if (true !== errors) {
     var error = new Error;
     error.message = errors.join();
@@ -147,7 +147,6 @@ function processRequest(jsonData, apiServer, callback) {
  * Validate message.
  */
 function websocketValidateJson(jsonData) {
-  var self = this;
 
   var v = new Validator();
   try {

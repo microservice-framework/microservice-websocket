@@ -151,7 +151,7 @@ function websocketValidateJson(jsonData) {
 
   var v = new Validator();
   try {
-    var schemaTask = JSON.parse(fs.readFileSync('schema/' + process.env.schema));
+    var schemaTask = JSON.parse(fs.readFileSync('schema/' + process.env.SCHEMA));
   } catch (e) {
     debug.debug('validateJson:Validator %O', e);
     var errors = [];

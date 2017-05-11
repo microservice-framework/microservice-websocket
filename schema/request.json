@@ -1,0 +1,33 @@
+{
+  "id": "/WSRequest",
+  "type": "object",
+  "properties": {
+    "method": {
+      "type": "string",
+      "description": "Method",
+       "enum": [ "POST", "GET", "PUT", "DELETE", "SEARCH", "OPTIONS" ],
+      "required": true
+    },
+    "EndPoint": {
+      "type": "string",
+      "description": "API endpoint.",
+      "required": true
+    },
+    "cmdHash": {
+      "type": "string",
+      "description": "Callback hash string."
+    },
+    "RecordID": {
+      "type": "string",
+      "description": "Record ID for GET, PUT, DELETE methods."
+    },
+    "RecordToken": {
+      "type": "string",
+      "description": "Record Token for GET, PUT, DELETE methods.",
+    },
+    "Request": {
+      "type": "object",
+      "description": "Body object for PUT, POST, SEARCH methods ."
+    }
+  }
+}

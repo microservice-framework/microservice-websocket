@@ -24,6 +24,7 @@
     "@microservice-framework/microservice-router-register": "^1.2.5",
     "debug": "^2.6.5",
     "dotenv": "^4.0.0",
+    "jsonschema": "^1.1.1",
     "ws": "^2.3.1"
   }
 }

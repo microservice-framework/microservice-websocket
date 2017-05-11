@@ -58,6 +58,12 @@
       "description": "Scope",
       "default": "ws",
       "required": true
+    },
+    "schema": {
+      "type": "string",
+      "description": "Do not change",
+      "default": "request.json",
+      "required": true
     }
   }
 }

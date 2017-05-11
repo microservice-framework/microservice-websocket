@@ -219,8 +219,19 @@ WebSocketServer.prototype.onValidated = function(ws) {
       });
     }
     if (self.data.callbacks['receivedMessage']) {
-      self.data.callbacks['receivedMessage'](message, function(err, answer) {
-        ws.send(JSON.stringify(answer , null, 2));
+      self.data.callbacks['receivedMessage'](message, ws.auth, function(err, answer) {
+        self.debug.debug('receivedMessage: err %O answer %O', err, answer);
+        if(message.cmdHash) {
+          let wsAnswer = {
+            cmdHash: message.cmdHash
+          }
+          if(err) {
+            wsAnswer.error = err;
+            self.debug.debug('Answer on %O is %O', message, wsAnswer);
+            return ws.send(JSON.stringify(answer , null, 2));
+          }
+          ws.send(JSON.stringify(answer , null, 2));
+        }
       });
     }
   });

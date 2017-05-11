@@ -8,6 +8,7 @@ const framework = '@microservice-framework';
 const MicroserviceRouterRegister = require(framework + '/microservice-router-register').register;
 const clientViaRouter = require(framework + '/microservice-router-register').clientViaRouter;
 const Validator = require('jsonschema').Validator;
+const fs = require('fs');
 
 const debugF = require('debug');
 

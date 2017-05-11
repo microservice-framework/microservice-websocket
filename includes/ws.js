@@ -131,7 +131,9 @@ WebSocketServer.prototype.processIPMMessage = function(message) {
 
   self.WSServer.clients.forEach(function each(client) {
     if (client.readyState === WebSocket.OPEN) {
-
+      if (!client.auth) {
+        return;
+      }
       // Check for token expire.
       if (!client.auth.internal) {
         if (client.auth.expireAt != -1 && client.auth.expireAt < Date.now()) {

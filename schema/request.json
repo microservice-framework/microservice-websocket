@@ -23,7 +23,7 @@
     },
     "RecordToken": {
       "type": "string",
-      "description": "Record Token for GET, PUT, DELETE methods.",
+      "description": "Record Token for GET, PUT, DELETE methods."
     },
     "Request": {
       "type": "object",

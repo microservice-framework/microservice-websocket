@@ -245,6 +245,11 @@ WebSocketServer.prototype.onValidated = function(ws) {
   ws.on('close', function close() {
     self.debug.request('Client disconnected');
   });
+  let wsAnswer = {
+    method: 'ready',
+    expireAt: ws.auth.expireAt,
+  }
+  ws.send(JSON.stringify(wsAnswer , null, 2));
 }
 
 /**

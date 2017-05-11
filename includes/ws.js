@@ -234,7 +234,8 @@ WebSocketServer.prototype.onValidated = function(ws) {
             self.debug.debug('Answer on %O is %O', message, wsAnswer);
             return ws.send(JSON.stringify(wsAnswer , null, 2));
           }
-          ws.send(JSON.stringify(answer , null, 2));
+          wsAnswer.message = answer;
+          ws.send(JSON.stringify(wsAnswer , null, 2));
         }
       });
     }

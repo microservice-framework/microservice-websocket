@@ -139,12 +139,14 @@ WebSocketServer.prototype.processIPMMessage = function(message) {
           return client.close(3003, 'Token expired');
         }
         if (!client.auth.scopes[message.scope]) {
-          self.debug.debug('ipmBroadcast:no scope %s for token %s', message.scope, client.auth.accessToken);
+          self.debug.debug('ipmBroadcast:no scope %s for token %s', message.scope,
+            client.auth.accessToken);
           return;
         }
         if (!client.auth.scopes[message.scope]['get']
           && !client.auth.scopes[message.scope]['search']) {
-          self.debug.debug('ipmBroadcast: scope %s for token %s do not support get or search', message.scope, client.auth.accessToken);
+          self.debug.debug('ipmBroadcast: scope %s for token %s do not support get or search',
+            message.scope, client.auth.accessToken);
           return;
         }
         // IF authorized by access token, send POST, PUT, DELETE only.
@@ -160,7 +162,8 @@ WebSocketServer.prototype.processIPMMessage = function(message) {
 
         loaderByList(message.loaders, client.auth.accessToken, function(err, result) {
           if (err) {
-            return self.debug.debug('ipmBroadcast: scope %s for token %s failed on loaders %O', message.scope, client.auth.accessToken, err);
+            return self.debug.debug('ipmBroadcast: scope %s for token %s failed on loaders %O',
+              message.scope, client.auth.accessToken, err);
           }
           message.loaders = result;
           if (self.data.callbacks['preSendMessage']) {
@@ -176,7 +179,8 @@ WebSocketServer.prototype.processIPMMessage = function(message) {
       if (message.loaders) {
         loaderByList(message.loaders, function(err, result) {
           if (err) {
-            return self.debug.debug('ipmBroadcast: scope %s for token %s failed on loaders %O', message.scope, client.auth.accessToken, err);
+            return self.debug.debug('ipmBroadcast: scope %s for token %s failed on loaders %O',
+              message.scope, client.auth.accessToken, err);
           }
           message.loaders = result;
           if (self.data.callbacks['preSendMessage']) {
@@ -221,11 +225,11 @@ WebSocketServer.prototype.onValidated = function(ws) {
     if (self.data.callbacks['receivedMessage']) {
       self.data.callbacks['receivedMessage'](message, ws.auth, function(err, answer) {
         self.debug.debug('receivedMessage: err %O answer %O', err, answer);
-        if(message.cmdHash) {
+        if (message.cmdHash) {
           let wsAnswer = {
             cmdHash: message.cmdHash
           }
-          if(err) {
+          if (err) {
             wsAnswer.error = err;
             self.debug.debug('Answer on %O is %O', message, wsAnswer);
             return ws.send(JSON.stringify(answer , null, 2));

@@ -83,16 +83,16 @@ function websocketReceivedMessage(jsonData, auth, callback) {
     debug.debug('REQUEST:validateJson %O', error);
     return callback(error);
   }
-  if(auth.internal) {
+  if (auth.internal) {
     return clientViaRouter(jsonData.EndPoint, function(err, apiServer) {
-      if(err){
+      if (err) {
         return callback(err);
       }
       processRequest(jsonData, apiServer, callback);
     });
   }
   clientViaRouter(jsonData.EndPoint, auth.accessToken, function(err, apiServer) {
-    if(err){
+    if (err) {
       return callback(err);
     }
     processRequest(jsonData, apiServer, callback);
@@ -102,28 +102,28 @@ function websocketReceivedMessage(jsonData, auth, callback) {
 /**
  * Process request.
  */
-function processRequest(jsonData, apiServer, callback){
-  switch(jsonData.method){
+function processRequest(jsonData, apiServer, callback) {
+  switch (jsonData.method){
     case 'POST': {
       apiServer.post(jsonData.Request, callback);
       break;
     }
     case 'GET': {
-      if(jsonData.RecordToken) {
+      if (jsonData.RecordToken) {
         return apiServer.get(sonData.RecordID, jsonData.RecordToken, callback);
       }
       apiServer.get(sonData.RecordID, callback);
       break;
     }
     case 'PUT': {
-      if(jsonData.RecordToken) {
+      if (jsonData.RecordToken) {
         return apiServer.put(sonData.RecordID, jsonData.RecordToken, jsonData.Request, callback);
       }
       apiServer.put(sonData.RecordID, jsonData.Request, callback);
       break;
     }
     case 'DELETE': {
-      if(jsonData.RecordToken) {
+      if (jsonData.RecordToken) {
         return apiServer.delete(sonData.RecordID, jsonData.RecordToken, callback);
       }
       apiServer.delete(sonData.RecordID, callback);
@@ -137,15 +137,16 @@ function processRequest(jsonData, apiServer, callback){
       apiServer.options(jsonData.Request, callback);
       break;
     }
-    default:
+    default: {
       return callback(new Error('Unsupported method'));
+    }
   }
 }
 
 /**
  * Validate message.
  */
-function websocketValidateJson = function(jsonData) {
+function websocketValidateJson(jsonData) {
   var self = this;
 
   var v = new Validator();
@@ -154,23 +155,23 @@ function websocketValidateJson = function(jsonData) {
   } catch (e) {
     debug.debug('validateJson:Validator %O', e);
     var errors = [];
-    errors.push( new Error('Internal error: schema syntax error.'));
+    errors.push(new Error('Internal error: schema syntax error.'));
     return errors;
   }
   var result = v.validate(jsonData, schemaTask);
-  if(["GET", "PUT", "DELETE"].indexOf(jsonData.method) != -1) {
-    if(!jsonData.RecordID) {
+  if (['GET', 'PUT', 'DELETE'].indexOf(jsonData.method) != -1) {
+    if (!jsonData.RecordID) {
       result.errors.push({
-        property: "RecordID",
-        message: "RecordID required if method is GET, PUT or DELETE"
+        property: 'RecordID',
+        message: 'RecordID required if method is GET, PUT or DELETE'
       });
     }
   }
-  if(["POST", "PUT", "SEARCH", "OPTIONS"].indexOf(jsonData.method) != -1) {
-    if(!jsonData.Request) {
+  if (['POST', 'PUT', 'SEARCH', 'OPTIONS'].indexOf(jsonData.method) != -1) {
+    if (!jsonData.Request) {
       result.errors.push({
-        property: "Request",
-        message: "Request required if method is POST, PUT, SEARCH or OPTIONS"
+        property: 'Request',
+        message: 'Request required if method is POST, PUT, SEARCH or OPTIONS'
       });
     }
   }

@@ -232,7 +232,7 @@ WebSocketServer.prototype.onValidated = function(ws) {
           if (err) {
             wsAnswer.error = err;
             self.debug.debug('Answer on %O is %O', message, wsAnswer);
-            return ws.send(JSON.stringify(answer , null, 2));
+            return ws.send(JSON.stringify(wsAnswer , null, 2));
           }
           ws.send(JSON.stringify(answer , null, 2));
         }

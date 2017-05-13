@@ -140,6 +140,11 @@ WebSocketServer.prototype.processIPMMessage = function(message) {
           self.debug.debug('ipmBroadcast:expired token %s', client.auth.accessToken);
           return client.close(3003, 'Token expired');
         }
+        if (!client.auth.scopes) {
+          self.debug.debug('ipmBroadcast:no scope %s for token %s', message.scope,
+            client.auth.accessToken);
+          return;
+        }
         if (!client.auth.scopes[message.scope]) {
           self.debug.debug('ipmBroadcast:no scope %s for token %s', message.scope,
             client.auth.accessToken);
@@ -225,11 +230,12 @@ WebSocketServer.prototype.onValidated = function(ws) {
       });
     }
     if (self.data.callbacks['receivedMessage']) {
-      self.data.callbacks['receivedMessage'](message, ws.auth, function(err, answer) {
-        self.debug.debug('receivedMessage: err %O answer %O', err, answer);
+      self.data.callbacks['receivedMessage'](message, ws.auth, function(err, answer, headers) {
+        self.debug.debug('receivedMessage: err %O answer %O', err, answer, headers);
         if (message.cmdHash) {
           let wsAnswer = {
-            cmdHash: message.cmdHash
+            cmdHash: message.cmdHash,
+            headers: headers,
           }
           if (err) {
             wsAnswer.error = err;

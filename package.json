@@ -1,6 +1,6 @@
 {
   "name": "microservice-websocket",
-  "version": "1.0.0",
+  "version": "1.2.2",
   "description": "Websocket based API router. Allow to listen to new messages across API",
   "main": "websocket.js",
   "scripts": {
@@ -21,7 +21,7 @@
   },
   "homepage": "https://github.com/microservice-framework/microservice-websocket#readme",
   "dependencies": {
-    "@microservice-framework/microservice-router-register": "^1.2.5",
+    "@microservice-framework/microservice-router-register": "^1.2.7",
     "debug": "^2.6.5",
     "dotenv": "^4.0.0",
     "jsonschema": "^1.1.1",

@@ -1,5 +1,5 @@
 {
-  "name": "microservice-websocket",
+  "name": "@microservice-framework/microservice-websocket",
   "version": "1.2.2",
   "description": "Websocket based API router. Allow to listen to new messages across API",
   "main": "websocket.js",

@@ -111,23 +111,23 @@ function processRequest(jsonData, apiServer, callback) {
     }
     case 'GET': {
       if (jsonData.RecordToken) {
-        return apiServer.get(sonData.RecordID, jsonData.RecordToken, callback);
+        return apiServer.get(jsonData.RecordID, jsonData.RecordToken, callback);
       }
-      apiServer.get(sonData.RecordID, callback);
+      apiServer.get(jsonData.RecordID, callback);
       break;
     }
     case 'PUT': {
       if (jsonData.RecordToken) {
-        return apiServer.put(sonData.RecordID, jsonData.RecordToken, jsonData.Request, callback);
+        return apiServer.put(jsonData.RecordID, jsonData.RecordToken, jsonData.Request, callback);
       }
-      apiServer.put(sonData.RecordID, jsonData.Request, callback);
+      apiServer.put(jsonData.RecordID, jsonData.Request, callback);
       break;
     }
     case 'DELETE': {
       if (jsonData.RecordToken) {
-        return apiServer.delete(sonData.RecordID, jsonData.RecordToken, callback);
+        return apiServer.delete(jsonData.RecordID, jsonData.RecordToken, callback);
       }
-      apiServer.delete(sonData.RecordID, callback);
+      apiServer.delete(jsonData.RecordID, callback);
       break;
     }
     case 'SEARCH': {

@@ -3,6 +3,8 @@ const fs = require('fs');
 require('dotenv').config();
 
 if (process.env.PIDFILE) {
-  var pid = fs.readFileSync(process.env.PIDFILE);
-  process.kill(pid, 'SIGHUP');
+  try {
+    var pid = fs.readFileSync(process.env.PIDFILE);
+    process.kill(pid, 'SIGINT');
+  } catch (e) {}
 }

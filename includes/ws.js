@@ -33,7 +33,6 @@ function WebSocketServer(data) {
   self.UDPServer.bind(data.ws.port);
   self.UDPServer.on('error', function(err) {
     self.debug.log('UDP Server error %O', err);
-    server.close();
   });
 
   self.UDPServer.on('message', function(message, rinfo) {
@@ -60,12 +59,12 @@ WebSocketServer.prototype.processUDPmessage = function(message, rinfo) {
   var answer = {}
   try {
     message = JSON.parse(message);
-  } catch(e) {
+  } catch (e) {
     self.debug.debug('UDP: message parse error %O', e);
     answer.error = e.message;
     answer = JSON.stringify(answer);
 
-    return self.UDPServer.send(Buffer.from(answer), rinfo.port, rinfo.address ,function(err) {
+    return self.UDPServer.send(Buffer.from(answer), rinfo.port, rinfo.address, function(err) {
       if (err) {
         self.debug.debug('UDP: sent error %O', err);
       }
@@ -76,7 +75,7 @@ WebSocketServer.prototype.processUDPmessage = function(message, rinfo) {
   if (!sign) {
     answer.error = 'No signature provided';
     answer = JSON.stringify(answer);
-    return self.UDPServer.send(Buffer.from(answer), rinfo.port, rinfo.address ,function(err) {
+    return self.UDPServer.send(Buffer.from(answer), rinfo.port, rinfo.address, function(err) {
       if (err) {
         self.debug.debug('UDP: sent error %O', err);
       }
@@ -86,7 +85,7 @@ WebSocketServer.prototype.processUDPmessage = function(message, rinfo) {
     self.debug.debug('UDP:Signature Malformed signature');
     answer.error = 'Malformed signature.';
     answer = JSON.stringify(answer);
-    return self.UDPServer.send(Buffer.from(answer), rinfo.port, rinfo.address ,function(err) {
+    return self.UDPServer.send(Buffer.from(answer), rinfo.port, rinfo.address, function(err) {
       if (err) {
         self.debug.debug('UDP: sent error %O', err);
       }
@@ -97,7 +96,7 @@ WebSocketServer.prototype.processUDPmessage = function(message, rinfo) {
     answer.error = 'Signature mismatch.';
     self.debug.debug('UDP:Signature mismatch');
     answer = JSON.stringify(answer);
-    return self.UDPServer.send(Buffer.from(answer), rinfo.port, rinfo.address ,function(err) {
+    return self.UDPServer.send(Buffer.from(answer), rinfo.port, rinfo.address, function(err) {
       if (err) {
         self.debug.debug('UDP: sent error %O', err);
       }
@@ -109,7 +108,7 @@ WebSocketServer.prototype.processUDPmessage = function(message, rinfo) {
   answer = { message: 'Received.' };
   answer = JSON.stringify(answer);
 
-  return self.UDPServer.send(Buffer.from(answer), rinfo.port, rinfo.address ,function(err) {
+  return self.UDPServer.send(Buffer.from(answer), rinfo.port, rinfo.address, function(err) {
     if (err) {
       self.debug.debug('UDP: sent error %O', err);
     }
@@ -125,7 +124,7 @@ WebSocketServer.prototype.processIPMMessage = function(message) {
   self.debug.debug('IPM Message received: %s', message.toString());
   try {
     message = JSON.parse(message);
-  } catch(e) {
+  } catch (e) {
     return self.debug.debug('JSON parse failed: %s', message.toString());
   }
 
@@ -218,12 +217,12 @@ WebSocketServer.prototype.onValidated = function(ws) {
     // Check for token expire.
     if (ws.auth.expireAt != -1 && ws.auth.expireAt < Date.now()) {
       self.debug.debug('authServer:expired token %s', ws.auth.accessToken);
-      return client.close(3003, 'Token expired');
+      return ws.close(3003, 'Token expired');
     }
     self.debug.request('Message received %O', message);
     try {
       message = JSON.parse(message);
-    } catch(e) {
+    } catch (e) {
       return ws.send({
         method: 'error',
         message: e.message
@@ -237,13 +236,18 @@ WebSocketServer.prototype.onValidated = function(ws) {
             cmdHash: message.cmdHash,
             headers: headers,
           }
-          if (err) {
-            wsAnswer.error = err;
-            self.debug.debug('Answer on %O is %O', message, wsAnswer);
-            return ws.send(JSON.stringify(wsAnswer , null, 2));
+
+          try {
+            if (err) {
+              wsAnswer.error = err;
+              self.debug.debug('Answer on %O is %O', message, wsAnswer);
+              return ws.send(JSON.stringify(wsAnswer, null, 2));
+            }
+            wsAnswer.message = answer;
+            ws.send(JSON.stringify(wsAnswer, null, 2));
+          } catch (e) {
+            self.debug.debug('Trying to send to already closed socket %O', e);
           }
-          wsAnswer.message = answer;
-          ws.send(JSON.stringify(wsAnswer , null, 2));
         }
       });
     }
@@ -255,7 +259,7 @@ WebSocketServer.prototype.onValidated = function(ws) {
     method: 'ready',
     expireAt: ws.auth.expireAt,
   }
-  ws.send(JSON.stringify(wsAnswer , null, 2));
+  ws.send(JSON.stringify(wsAnswer, null, 2));
 }
 
 /**

@@ -1,6 +1,6 @@
 {
   "name": "@microservice-framework/microservice-websocket",
-  "version": "1.2.3",
+  "version": "1.2.4",
   "description": "Websocket based API router. Allow to listen to new messages across API",
   "main": "websocket.js",
   "scripts": {
@@ -8,7 +8,7 @@
     "start": "DEBUG=http:log,ws-cluster:*,ws-worker:log,ws-worker:request node  --max-old-space-size=48 websocket.js",
     "stop": "node kill.js",
     "status": "node status.js",
-    "jscs": "jscs --fix *.js includes/*.js"
+    "cs": "eslint --fix *.js includes/*.js"
   },
   "repository": {
     "type": "git",

@@ -134,7 +134,7 @@ function processRequest(jsonData, apiServer, callback) {
       apiServer.search(jsonData.Request, callback);
       break;
     }
-    case 'POST': {
+    case 'OPTIONS': {
       apiServer.options(jsonData.Request, callback);
       break;
     }
@@ -150,11 +150,11 @@ function processRequest(jsonData, apiServer, callback) {
 function websocketValidateJson(jsonData) {
 
   var v = new Validator();
+  var errors = [];
   try {
     var schemaTask = JSON.parse(fs.readFileSync('schema/' + process.env.SCHEMA));
   } catch (e) {
     debug.debug('validateJson:Validator %O', e);
-    var errors = [];
     errors.push(new Error('Internal error: schema syntax error.'));
     return errors;
   }
@@ -176,7 +176,6 @@ function websocketValidateJson(jsonData) {
     }
   }
   if (result.errors.length > 0) {
-    var errors = [];
     for (var errorNum in result.errors) {
       errors.push(result.errors[ errorNum ].property + ' ' + result.errors[ errorNum ].message);
     }
@@ -184,4 +183,4 @@ function websocketValidateJson(jsonData) {
   }
   return true;
 
-};
+}

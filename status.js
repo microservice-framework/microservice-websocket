@@ -6,7 +6,7 @@ var pid = false;
 if (process.env.PIDFILE) {
   try {
     pid = fs.readFileSync(process.env.PIDFILE).toString('utf8');
-  }catch(e) {}
+  } catch (e) {}
 }
 
 var result = {}
